@@ -1,0 +1,28 @@
+import openpyxl
+import requests
+
+# Set your Mailgun API key and domain name
+API_KEY = "YOUR_API_KEY"
+DOMAIN_NAME = "YOUR_DOMAIN_NAME"
+
+# Read email addresses from Excel file
+wb = openpyxl.load_workbook('email_list.xlsx')
+sheet = wb.active
+for cell in sheet['B']:
+    email_address = cell.value
+    if email_address:
+        # Send email message using Mailgun API
+        response = requests.post(
+            f"https://api.mailgun.net/v3/{DOMAIN_NAME}/messages",
+            auth=("api", API_KEY),
+            data={
+                "from": "Sender Name <sender@example.com>",
+                "to": email_address,
+                "subject": "Test Email",
+                "text": "This is a test email sent via Mailgun!"
+            }
+        )
+        if response.status_code == 200:
+            print(f"Email sent to {email_address}")
+        else:
+            print(f"Failed to send email to {email_address}. Error message: {response.content}")
